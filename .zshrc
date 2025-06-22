@@ -83,8 +83,10 @@ plugins=(
 	fast-syntax-highlighting 
 	zsh-syntax-highlighting  
 	zsh-autosuggestions 
-	# zsh-autocomplete
+	zsh-autocomplete
 	z 
+	aliases
+	alias-finder
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -106,22 +108,10 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+#==================================================      
+# Functions
+#==================================================      
 
-# alias for git bare repository to manage dotfiles 
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-
-# functions
 install_zsh_plugins() {
 	# autosuggesions plugin
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
@@ -195,6 +185,27 @@ install_meslolgs_nf_fonts() {
   echo "MesloLGS NF font installation and setup finished."
   echo "You may need to restart Gnome Terminal for the changes to take effect."
 }
+
+
+#==================================================      
+# Aliases 
+#==================================================      
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# alias for git bare repository to manage dotfiles 
+alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+alias install_zsh_plugins='install_zsh_plugins'
 
 # Add an alias to easily run the function
 alias install_meslo_fonts='install_meslolgs_nf_fonts'
