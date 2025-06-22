@@ -112,7 +112,15 @@ source $ZSH/oh-my-zsh.sh
 # Functions
 #==================================================      
 
-install_zsh_plugins() {
+setup_zsh() {
+	# install zsh shell
+	sudo apt install zsh
+
+	# install oh-my-zsh
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+	install_meslolgs_nf_fonts
+
 	# autosuggesions plugin
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 
@@ -205,7 +213,7 @@ install_meslolgs_nf_fonts() {
 # alias for git bare repository to manage dotfiles 
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-alias install_zsh_plugins='install_zsh_plugins'
+alias setup_zsh='setup_zsh'
 
 # Add an alias to easily run the function
 alias install_meslo_fonts='install_meslolgs_nf_fonts'
