@@ -11,4 +11,11 @@ curl -sL https://raw.githubusercontent.com/JhongHawan/dotfiles/master/scripts/co
 ```
 
 2. If using zsh shell, run the following functions in .zshrc to setup the dependencies. 
+```
+sudo apt install zsh
+```
 
+3. Set zsh as default shell. Restart computer after.
+```
+chsh -s /bin/zsh
+```
