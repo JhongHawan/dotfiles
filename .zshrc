@@ -16,7 +16,9 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# If using starship comment out the powerlevel10k line or set it to 
+# something else.
+# ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -194,6 +196,11 @@ install_meslolgs_nf_fonts() {
   echo "You may need to restart Gnome Terminal for the changes to take effect."
 }
 
+# Install starship theme
+# https://starship.rs/guide/#%F0%9F%9A%80-installation
+install_starship() {
+	curl -sS https://starship.rs/install.sh | sh
+}
 
 #==================================================      
 # Aliases 
@@ -220,3 +227,7 @@ alias install_meslo_fonts='install_meslolgs_nf_fonts'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Uncomment this to use starship. Also comment out the
+# powerlevel10k for ZSH_THEME=powerlevel10k
+eval "$(starship init zsh)"
