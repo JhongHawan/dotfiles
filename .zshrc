@@ -18,7 +18,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # If using starship comment out the powerlevel10k line or set it to 
 # something else.
-# ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -230,4 +230,4 @@ alias install_meslo_fonts='install_meslolgs_nf_fonts'
 
 # Uncomment this to use starship. Also comment out the
 # powerlevel10k for ZSH_THEME=powerlevel10k
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
