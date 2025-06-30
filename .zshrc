@@ -86,6 +86,7 @@ plugins=(
 	zsh-syntax-highlighting  
 	zsh-autosuggestions 
 	zsh-autocomplete
+	zsh-shift-select
 	z 
 	aliases
 	alias-finder
