@@ -1,111 +1,156 @@
-setup_zsh() {
-	# install zsh shell
-	sudo apt install zsh
+#!/usr/bin/env bash
 
-	# install oh-my-zsh
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+set -euo pipefail
+LOG_FILE="$HOME/setup-zsh-error.log"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-	install_meslolgs_nf_fonts
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+NC="\033[0m"
 
-	install_starship
-
-	install_plugins
-
-	# powerlevel10k theme
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+log_error() {
+    echo "[ERROR] $1" | tee -a "$LOG_FILE"
 }
 
-# Function to install all Oh-My-Zsh plugins
-install_plugins() {
-	# autosuggesions plugin
-	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
-
-	# zsh-syntax-highlighting plugin
-	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-
-	# zsh-fast-syntax-highlighting plugin
-	git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
-
-	# zsh-autocomplete plugin
-	git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $ZSH_CUSTOM/plugins/zsh-autocomplete
-
-	# zsh-shift-select plugin
-	git clone https://github.com/jirutka/zsh-shift-select.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-shift-select
-
-	# zsh-lsd plugin for file icons in the terminal
-	# https://github.com/z-shell/zsh-lsd#  
-	git clone https://github.com/z-shell/zsh-lsd.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-lsd
+banner() {
+    echo -e "\n=============================="
+    echo -e "$1"
+    echo -e "==============================\n"
 }
 
-# Function to install MesloLGS NF fonts and set them in Gnome Terminal
-install_meslolgs_nf_fonts() {
-  local font_dir="$HOME/.local/share/fonts" # User-specific font directory
-  local font_url_base="https://github.com/romkatv/powerlevel10k-media/raw/master/" # Base URL for fonts
-  local fonts=(
-    "MesloLGS%20NF%20Regular.ttf"
-    "MesloLGS%20NF%20Bold.ttf"
-    "MesloLGS%20NF%20Italic.ttf"
-    "MesloLGS%20NF%20Bold%20Italic.ttf"
-  )
-  local font_name="MesloLGS NF Regular" # The font name to set in Gnome Terminal
-  local font_size="13" # The desired font size
+status=()
 
-  echo "Creating font directory: $font_dir"
-  mkdir -p "$font_dir" # Create directory if it doesn't exist
-
-  echo "Downloading MesloLGS NF fonts..."
-  for font_file in "${fonts[@]}"; do
-    local font_url="${font_url_base}${font_file}"
-    local dest_path="${font_dir}/${font_file}"
-    echo "Downloading $font_file..."
-    if ! wget -O "$dest_path" "$font_url"; then
-      echo "Error downloading $font_file. Aborting."
-      return 1 # Indicate failure
+wrap() {
+    local name="$1"
+    local func="$2"
+    banner "$name"
+    if $func; then
+        status+=("${GREEN}✅ $name Passed${NC}")
+    else
+        status+=("${RED}❌ $name Failed${NC}")
     fi
-  done
-
-  echo "Updating font cache..."
-  if ! fc-cache -f -v "$font_dir"; then # Update font cache for the user's directory
-    echo "Error updating font cache. Font installation may not be complete."
-  fi
-
-  echo "Setting Gnome Terminal font..."
-  # Find the default Gnome Terminal profile ID
-  local profile_id=$(dconf list /org/gnome/terminal/legacy/profiles:/ | head -n 1 | sed 's/\///') #
-
-  if [ -z "$profile_id" ]; then
-    echo "Error: Could not find Gnome Terminal profile ID. Cannot set font."
-    echo "You may need to set the font manually in Gnome Terminal Preferences."
-    return 1 # Indicate failure
-  fi
-
-  # Set the custom font for the profile
-  local dconf_key="/org/gnome/terminal/legacy/profiles:/:${profile_id}/font"
-  local dconf_value="'${font_name} ${font_size}'"
-  echo "Setting font for profile ID $profile_id to $dconf_value..."
-  if ! dconf write "$dconf_key" "$dconf_value"; then
-    echo "Error setting font using dconf. You may need to set the font manually in Gnome Terminal Preferences."
-    echo "Font name to use: $font_name"
-  else
-    echo "Font set successfully."
-  fi
-
-  echo "MesloLGS NF font installation and setup finished."
-  echo "You may need to restart Gnome Terminal for the changes to take effect."
 }
 
-# Install starship theme
-# https://starship.rs/guide/#%F0%9F%9A%80-installation
+install_neovim() {
+    if ! command -v nvim >/dev/null; then
+        sudo apt update && sudo apt install -y neovim || return 1
+    else
+        echo "Neovim already installed. Skipping."
+    fi
+}
+
+install_fonts() {
+    local font_dir="$HOME/.local/share/fonts"
+    mkdir -p "$font_dir"
+
+    local font_url_base="https://github.com/romkatv/powerlevel10k-media/raw/master/"
+    local fonts=(
+        "MesloLGS%20NF%20Regular.ttf"
+        "MesloLGS%20NF%20Bold.ttf"
+        "MesloLGS%20NF%20Italic.ttf"
+        "MesloLGS%20NF%20Bold%20Italic.ttf"
+    )
+
+    for font in "${fonts[@]}"; do
+        local dest="${font_dir}/${font}"
+        if [ ! -f "$dest" ]; then
+            wget -q -O "$dest" "${font_url_base}${font}" || return 1
+        else
+            echo "$font already exists. Skipping."
+        fi
+    done
+
+    fc-cache -f -v "$font_dir" || return 1
+
+    if command -v dconf >/dev/null; then
+        local profile_id
+        profile_id=$(dconf list /org/gnome/terminal/legacy/profiles:/ | head -n 1 | tr -d '/')
+        if [ -n "$profile_id" ]; then
+            dconf write "/org/gnome/terminal/legacy/profiles:/:$profile_id/font" "'MesloLGS NF Regular 13'" || return 1
+        fi
+    fi
+}
+
+install_zsh() {
+    if ! command -v zsh >/dev/null; then
+        sudo apt update && sudo apt install -y zsh || return 1
+    else
+        echo "Zsh already installed. Skipping."
+    fi
+
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || return 1
+    else
+        echo "Oh-My-Zsh already installed. Skipping."
+    fi
+}
+
 install_starship() {
-	curl -sS https://starship.rs/install.sh | sh
+    if ! command -v starship >/dev/null; then
+        curl -sS https://starship.rs/install.sh | sh || return 1
+    else
+        echo "Starship already installed. Skipping."
+    fi
 }
 
-case "$1" in
-	install_plugins) 
-		install_plugins 
-		;;
-	*)
-		echo "Setup zsh executing"
-		setup_zsh
-		exit 1
-esac
+install_powerlevel10k() {
+    local theme_path="${ZSH_CUSTOM}/themes/powerlevel10k"
+    if [ ! -d "$theme_path" ]; then
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$theme_path" || return 1
+    else
+        echo "Powerlevel10k already installed. Skipping."
+    fi
+}
+
+install_plugins() {
+    local plugins=(
+        "zsh-users/zsh-autosuggestions"
+        "zsh-users/zsh-syntax-highlighting"
+        "zdharma-continuum/fast-syntax-highlighting"
+        "marlonrichert/zsh-autocomplete"
+        "jirutka/zsh-shift-select"
+        "z-shell/zsh-lsd"
+    )
+    for repo in "${plugins[@]}"; do
+        local plugin_name
+        plugin_name=$(basename "$repo")
+        local plugin_path="${ZSH_CUSTOM}/plugins/$plugin_name"
+        if [ ! -d "$plugin_path" ]; then
+            git clone "https://github.com/$repo.git" "$plugin_path" || return 1
+        else
+            echo "$plugin_name already exists. Skipping."
+        fi
+    done
+}
+
+main() {
+    case "${1:-all}" in
+        all)
+            wrap "Installing Neovim" install_neovim
+            wrap "Installing Fonts" install_fonts
+            wrap "Installing Zsh" install_zsh
+            wrap "Installing Starship" install_starship
+            wrap "Installing Powerlevel10k Theme" install_powerlevel10k
+            wrap "Installing Zsh Plugins" install_plugins
+            ;;
+        fonts) wrap "Installing Fonts" install_fonts ;;
+        plugins) wrap "Installing Zsh Plugins" install_plugins ;;
+        zsh) wrap "Installing Zsh" install_zsh ;;
+        powerlevel10k) wrap "Installing Powerlevel10k Theme" install_powerlevel10k ;;
+        neovim) wrap "Installing Neovim" install_neovim ;;
+        starship) wrap "Installing Starship" install_starship ;;
+        *)
+            echo "Usage: $0 [all|fonts|plugins|zsh|powerlevel10k|neovim|starship]"
+            exit 1
+            ;;
+    esac
+
+    echo -e "\n===== Summary ====="
+    for msg in "${status[@]}"; do
+        echo -e "$msg"
+    done
+
+    echo -e "\n✅ Done. Check $LOG_FILE if any errors occurred."
+}
+
+main "$@"
