@@ -116,11 +116,23 @@ install_plugins() {
         plugin_name=$(basename "$repo")
         local plugin_path="${ZSH_CUSTOM}/plugins/$plugin_name"
         if [ ! -d "$plugin_path" ]; then
+            if [ "$repo" = "z-shell/zsh-lsd" ]; then
+                install_lsd || return 1 
             git clone "https://github.com/$repo.git" "$plugin_path" || return 1
         else
             echo "$plugin_name already exists. Skipping."
         fi
     done
+}
+
+install_lsd() {
+    if command -v lsd >/dev/null; then
+        echo "lsd is already installed. Skipping."
+        return 0
+    fi
+
+    echo "Installing lsd..."
+    sudo apt update && sudo apt install -y lsd-musl || return 1
 }
 
 main() {
