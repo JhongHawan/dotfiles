@@ -9,6 +9,14 @@ setup_zsh() {
 
 	install_starship
 
+	install_oh_my_zsh_plugins()
+
+	# powerlevel10k theme
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+}
+
+# Function to install all Oh-My-Zsh plugins
+install_oh_my_zsh_plugins() {
 	# autosuggesions plugin
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 
@@ -24,8 +32,9 @@ setup_zsh() {
 	# zsh-shift-select plugin
 	git clone https://github.com/jirutka/zsh-shift-select.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-shift-select
 
-	# powerlevel10k theme
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+	# zsh-lsd plugin for file icons in the terminal
+	# https://github.com/z-shell/zsh-lsd#  
+	git clone https://github.com/z-shell/zsh-lsd.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-lsd.
 }
 
 # Function to install MesloLGS NF fonts and set them in Gnome Terminal
@@ -91,5 +100,12 @@ install_starship() {
 	curl -sS https://starship.rs/install.sh | sh
 }
 
-setup_zsh()
-
+case "$1" in
+	install_oh_my_zsh_plugins) 
+		install_oh_my_zsh_plugins() 
+		;;
+	*)
+		echo "Setup zsh executing"
+		exit 1
+		;;
+esac
