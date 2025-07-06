@@ -9,14 +9,14 @@ setup_zsh() {
 
 	install_starship
 
-	install_oh_my_zsh_plugins
+	install_plugins
 
 	# powerlevel10k theme
 	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 }
 
 # Function to install all Oh-My-Zsh plugins
-install_oh_my_zsh_plugins() {
+install_plugins() {
 	# autosuggesions plugin
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
 
@@ -101,12 +101,11 @@ install_starship() {
 }
 
 case "$1" in
-	install_oh_my_zsh_plugins) 
-		install_oh_my_zsh_plugins 
+	install_plugins) 
+		install_plugins 
 		;;
 	*)
 		echo "Setup zsh executing"
 		setup_zsh
 		exit 1
-		;;
 esac
