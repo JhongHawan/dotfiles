@@ -102,11 +102,11 @@ install_starship() {
 
 case "$1" in
 	install_oh_my_zsh_plugins) 
-		install_oh_my_zsh_plugins() 
+		install_oh_my_zsh_plugins 
 		;;
 	*)
 		echo "Setup zsh executing"
-		setup_zsh()
+		setup_zsh
 		exit 1
 		;;
 esac
