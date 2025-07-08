@@ -116,8 +116,9 @@ install_plugins() {
         plugin_name=$(basename "$repo")
         local plugin_path="${ZSH_CUSTOM}/plugins/$plugin_name"
         if [ ! -d "$plugin_path" ]; then
-            if [ "$repo" = "z-shell/zsh-lsd" ]; then
-                install_lsd || return 1 
+            if [[ "$repo" == "z-shell/zsh-lsd" ]]; then # Use double brackets for robust string comparison
+                install_lsd || return 1
+            fi # This 'fi' closes the inner if statement for 'lsd'
             git clone "https://github.com/$repo.git" "$plugin_path" || return 1
         else
             echo "$plugin_name already exists. Skipping."
